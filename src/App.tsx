@@ -1,9 +1,9 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import { Home } from './pages';
+import { Home, Login } from './pages';
 import { Header } from './components';
 import logo from './logo.svg';
-import './App.css';
+import style from './App.module.css'
 
 function App() {
   return (
@@ -25,10 +25,12 @@ function App() {
     // </div>
     <>
       <Header />
-      <Routes>
-          <Route path="/" element={<Home />} />
-
-      </Routes>
+      <main className={style.main}>
+        <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="login" element={<Login />} />
+        </Routes>        
+      </main>
     </>
   );
 }
