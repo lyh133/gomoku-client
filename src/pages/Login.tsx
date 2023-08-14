@@ -1,13 +1,11 @@
 import { useState, useContext, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-// import { Button, Input, Message } from '../components'
 import { UserContext } from '../context'
 
 import style from './Login.module.css'
 
 export default function Login() {
   const { login } = useContext(UserContext)
-  const usernameInput = useRef<HTMLInputElement | null>(null)
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -23,11 +21,6 @@ export default function Login() {
     }
   }
 
-  useEffect(() => {
-    if (usernameInput.current) {
-      usernameInput.current.focus()
-    }
-  }, [])
 
   return (
     <form
@@ -37,9 +30,8 @@ export default function Login() {
         handleLogin()
       }}
     >
-      {/* {errorMessage && <Message variant="error" message={errorMessage} />} */}
+      {errorMessage && <div style={{ color: 'red' }}>{errorMessage}</div>}
       <input
-        // ref={usernameInput}
         name="username"
         placeholder="Username"
         value={username}
