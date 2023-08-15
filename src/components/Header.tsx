@@ -10,8 +10,9 @@ export default function Header() {
     return (
         <header className={style.header}>
           <div className={style.container}>
-            <Link to="/">UNE Cinema App</Link>
+            <Link to="/">Gomoku</Link>
             {!user && <div className={style.actions} onClick={() => {navigate('./Login')}}>Log in</div>}
+            {user && <div className={style.actions} onClick={() => {navigate('./Games')}}>Previous Games</div>}
           </div>
         </header>
       )

@@ -6,11 +6,7 @@ import { useParams } from 'react-router-dom';
 import { playerType, move, gameHistory} from '../types'
 import { useLocalStorage } from '../hooks'
 
-// interface BoardProps {
-//     size: number;
-// }
-// // React.FC<BoardProps>
-const Game: React.FC = () => {
+const GameHistory: React.FC = () => {
 
     const [currentPlayer, setCurrentPlayer] = useState<playerType>("black");
     const [gameEnded, setGameEnded] = useState(false);
@@ -153,4 +149,4 @@ const Game: React.FC = () => {
     );
 
 }
-export default Game
+export default GameHistory

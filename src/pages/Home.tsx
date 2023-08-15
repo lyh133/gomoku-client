@@ -1,15 +1,19 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-
+import { UserContext } from '../context'
 import style from './Home.module.css'
 
 export default function Home() {
   const navigate = useNavigate()
-  const [selectedSize, setSelectedSize] = useState('5');
+  const [selectedSize, setSelectedSize] = useState('5')
+  const { user } = useContext(UserContext)
   const handleStart = () => {
 
-    navigate(`./Game/${selectedSize}`);
-
+    if(user) {
+      navigate(`./Game/${selectedSize}`);
+    }else {
+      navigate(`./Login`);
+    }
   }
 
   const handleSizeChange = (event : React.ChangeEvent<HTMLSelectElement>) => {
