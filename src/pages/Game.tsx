@@ -1,15 +1,11 @@
 import { useContext, useEffect, useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import style from './Game.module.css'
 import { UserContext } from '../context'
 import { useParams } from 'react-router-dom';
 import { playerType, move, gameHistory} from '../types'
 import { useLocalStorage } from '../hooks'
 
-// interface BoardProps {
-//     size: number;
-// }
-// // React.FC<BoardProps>
 const Game: React.FC = () => {
 
     const [currentPlayer, setCurrentPlayer] = useState<playerType>("black");

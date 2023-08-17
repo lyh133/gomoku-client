@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react'
-import { Link, useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import style from './Game.module.css'
 import { UserContext } from '../context'
 import { useParams } from 'react-router-dom';
-import { playerType, move, gameHistory} from '../types'
+import { move, gameHistory} from '../types'
 import { useLocalStorage } from '../hooks'
 
 const GameHistory: React.FC = () => {
@@ -12,7 +12,7 @@ const GameHistory: React.FC = () => {
     const [size, setSize] = useState(0);
     const { id } = useParams();
 
-    const [save, setSave] = useLocalStorage< Array<gameHistory> | []>('gameHistory', [])
+    const [save] = useLocalStorage< Array<gameHistory> | []>('gameHistory', [])
     const navigate = useNavigate()
 
     const { user } = useContext(UserContext)
@@ -40,6 +40,11 @@ const GameHistory: React.FC = () => {
     const isBlack = (turn:number | null): boolean => {
       if(turn == null) return true
       return (turn % 2) !== 0 
+    }
+
+
+    const handleBack = () => {
+      navigate(`../Games`)
     }
 
 
@@ -76,9 +81,14 @@ const GameHistory: React.FC = () => {
     }
   
     return (
-      <div>          
-        {rows}
-      </div>
+      <>
+        <div>          
+          {rows}
+        </div> 
+        <button onClick={handleBack}>Back</button>
+        <div style={{ fontSize: "50px"}}>{save[Number(id)].winner ? "winner is :" + save[Number(id)].winner : "Game draw"}</div>
+      </>
+
     );
 
 }
