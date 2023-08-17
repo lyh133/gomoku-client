@@ -3,23 +3,26 @@ import { useNavigate } from 'react-router-dom'
 import style from './Games.module.css'
 import { useLocalStorage } from '../hooks'
 import { playerType, move, gameHistory} from '../types'
+import { UserContext } from '../context';
 
 export default function Games() {
     const navigate = useNavigate()
     const [save, setSave] = useLocalStorage< Array<gameHistory> | []>('gameHistory', [])
-    
+    const { user } = useContext(UserContext)
+
     useEffect(() => {
-        console.log(save.length)
-  
+        if(!user) {
+            navigate(`../Login`)
+        }
       }, []);
-
-    const openHistory = () =>{
-
-    }
 
     return (
     <div className={style.historyContainer}>
-        {save.map((game,ind)=>{return (
+        {save.map((game,ind)=>{
+
+            const openHistory = () => navigate('../game-log/'+ind);
+
+            return (
             <div className={style.historyBar} >
                 {"Game "+(ind+1)+" "}
                 {game.date}

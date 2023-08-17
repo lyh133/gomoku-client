@@ -8,144 +8,77 @@ import { useLocalStorage } from '../hooks'
 
 const GameHistory: React.FC = () => {
 
-    const [currentPlayer, setCurrentPlayer] = useState<playerType>("black");
-    const [gameEnded, setGameEnded] = useState(false);
-    const [isDraw, setIsDraw] = useState(false);
-    const [message, setMessage] = useState('black\'s turn');
-    const { size } = useParams();
 
-    const [moves, setMoves] = useState<Array<move>>([])
+    const [size, setSize] = useState(0);
+    const { id } = useParams();
 
     const [save, setSave] = useLocalStorage< Array<gameHistory> | []>('gameHistory', [])
     const navigate = useNavigate()
 
-    const [board, setBoard] = useState<Array<Array<string | null>>>(
-        Array.from({ length: Number(size) }, () => Array(Number(size)).fill(null))
-      );
-
-
-    const saveGame = () => {
-
-      if(gameEnded){
-        let today  = new Date();
-        const newGame:gameHistory = {
-          date: today.toISOString().split('T')[0],
-          winner: isDraw ? null : currentPlayer,
-          moves: moves
-        }
-        const updatedSave = [...save]
-        setSave(updatedSave.concat(newGame))
-        navigate(`../Games`);
-
-      } else {
-        navigate(`../`);
-
+    const { user } = useContext(UserContext)
+    useEffect(() => {
+      if(!user) {
+          navigate(`../Login`)
       }
-
-    }
-    const restartGame = () => {
-      navigate(0)
-    }
+    }, []);
 
     useEffect(() => {
+      setSize(Number(save[Number(id)].size))
+    }, [id]);
+    
+    const findMove = (row: number, col: number): move | null => {
+      const game = save[Number(id)]
+      let result: move | null = null;
+      game.moves.forEach(move => {
+        if(move.colIndex === col && move.rowIndex === row) {
+          result = move
+        }
+      })
+      return result
+    }
 
-      if(!gameEnded) {
-        if(checkWinningState(board,Number(size))){
-          setGameEnded(true)
-          currentPlayer === 'white' ? setMessage("Game Over black won") : setMessage("Game Over white won")
-      
-        }else if(checkDraw()) {
-          setGameEnded(true)
-          setIsDraw(true)
-          setMessage("Game Draw")
-        }else{
-          setMessage(currentPlayer + "'s turn")
-        }        
-      }
-
-    }, [currentPlayer]);
-
-    const handleBoxClick = (rowIndex: number, colIndex: number) => {
-
-      if (!gameEnded && !board[rowIndex][colIndex]) {
-        const updatedMoves = [...moves]
-        setMoves(updatedMoves.concat({ rowIndex: rowIndex, colIndex: colIndex, player: currentPlayer}))
-        const updatedBoard = [...board];
-        updatedBoard[rowIndex][colIndex] = currentPlayer;
-        setBoard(updatedBoard);
-        setCurrentPlayer(currentPlayer === "black" ? "white" : "black");
-      }
-
-    };
-
-    const checkDraw = () : boolean =>{
-      return board.every((row: any ) => row.every((cell: any) => cell !== null))
-    };
-
-    const checkWinningState = (board: Array<Array<string | null>> , size: number): boolean =>{
-      const directions: [number, number][] = [
-          [0, 1],   // Right
-          [1, 0],   // Down
-          [1, 1],   // Diagonal down-right
-          [1, -1]   // Diagonal down-left
-      ];
-  
-      function isInRange(x: number, y: number): boolean {
-          return x >= 0 && x < size && y >= 0 && y < size;
-      }
-  
-      function checkConsecutive(x: number, y: number, dx: number, dy: number, value: string | null): boolean {
-          let consecutiveCount = 0;
-          while (isInRange(x, y) && board[x][y] === value) {
-              consecutiveCount++;
-              x += dx;
-              y += dy;
-          }
-          return consecutiveCount >= 5;
-      }
-  
-      for (let i = 0; i < size; i++) {
-          for (let j = 0; j < size; j++) {
-              if (board[i][j] !== null) {
-                  for (const [dx, dy] of directions) {
-                      if (checkConsecutive(i, j, dx, dy, board[i][j])) {
-                          return true;
-                      }
-                  }
-              }
-          }
-      }
-  
-      return false;
-  }
+    const isBlack = (turn:number | null): boolean => {
+      if(turn == null) return true
+      return (turn % 2) !== 0 
+    }
 
 
-    return (
-      <>
-        <div className={style.board}>
-          { board.map((row, rIndex) => {return(
-            <div className={style.row} key={"r"+rIndex} >
-                {row.map((_, cIndex) => {return(
-                    <div className={style.box}>
-                        <div 
-                          onClick={() => handleBoxClick(rIndex, cIndex)}
-                          className={`${style.circle} 
-                            ${board[rIndex][cIndex] === 'black' ? `${style.black}` :  
-                            board[rIndex][cIndex] === 'white' ? `${style.white}` : ''}`}
-                          key={"rc"+String(cIndex)+String(rIndex)}>
-                        </div>
-                      </div>
-                )})}
+    const rows = [];
 
+    //make Board
+    for (let r = 0; r < size; r++) {
+      const cells = [];
+      for(let c = 0; c < size; c++) {
+        //find if there is a move in the cell
+        const move = findMove(r, c);
+        var circleClassName = `${style.circle}`;
+        if(move){
+          circleClassName = `${style.circle} ${
+              isBlack(move.moveNum)
+              ? `${style.black}`
+              : `${style.white}`
+          }`;
+        }
 
+        cells.push(
+          <div className={style.box} key={"rcd" + String(c) + String(r)}>
+            <div className={circleClassName}>
+              <div className={style.turn}>{move ? move.moveNum :""}</div>
             </div>
-            )})}
-          
+          </div>
+        );
+      }
+      rows.push(
+        <div className={style.row} key={"rd" + r}>
+          {cells}
         </div>
-        <div className={style.message}>{message}</div>
-        <button onClick={restartGame}>Restart</button>
-        <button onClick={saveGame}>Leave</button>
-      </>
+      );
+    }
+  
+    return (
+      <div>          
+        {rows}
+      </div>
     );
 
 }

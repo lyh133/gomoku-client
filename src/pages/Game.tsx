@@ -14,6 +14,7 @@ const Game: React.FC = () => {
 
     const [currentPlayer, setCurrentPlayer] = useState<playerType>("black");
     const [gameEnded, setGameEnded] = useState(false);
+    const [moveNum, setMoveNum] = useState(1);
     const [isDraw, setIsDraw] = useState(false);
     const [message, setMessage] = useState('black\'s turn');
     const { size } = useParams();
@@ -27,6 +28,14 @@ const Game: React.FC = () => {
         Array.from({ length: Number(size) }, () => Array(Number(size)).fill(null))
       );
 
+    const { user } = useContext(UserContext)
+    useEffect(() => {
+      if(!user) {
+          navigate(`../Login`)
+      }
+    }, []);
+
+
 
     const saveGame = () => {
 
@@ -34,7 +43,8 @@ const Game: React.FC = () => {
         let today  = new Date();
         const newGame:gameHistory = {
           date: today.toISOString().split('T')[0],
-          winner: isDraw ? null : currentPlayer,
+          winner: isDraw ? null : currentPlayer === 'black' ? 'white' : 'black',
+          size: Number(size),
           moves: moves
         }
         const updatedSave = [...save]
@@ -73,11 +83,12 @@ const Game: React.FC = () => {
 
       if (!gameEnded && !board[rowIndex][colIndex]) {
         const updatedMoves = [...moves]
-        setMoves(updatedMoves.concat({ rowIndex: rowIndex, colIndex: colIndex, player: currentPlayer}))
+        setMoves(updatedMoves.concat({ rowIndex: rowIndex, colIndex: colIndex, player: currentPlayer, moveNum: moveNum}))
         const updatedBoard = [...board];
         updatedBoard[rowIndex][colIndex] = currentPlayer;
         setBoard(updatedBoard);
         setCurrentPlayer(currentPlayer === "black" ? "white" : "black");
+        setMoveNum(moveNum+1)
       }
 
     };
