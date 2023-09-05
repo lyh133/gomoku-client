@@ -4,9 +4,9 @@ import { UserContext } from '../context'
 
 import style from './Login.module.css'
 
-export default function Login() {
+export default function Register() {
   
-  const { login } = useContext(UserContext)
+  const { register} = useContext(UserContext)
   const navigate = useNavigate()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -14,7 +14,7 @@ export default function Login() {
 
   const handleLogin = async () => {
     setErrorMessage('')
-    const result = await login(username, password)
+    const result = await register(username, password)
     if (result === true) {
       navigate('/')
     } else {
@@ -51,15 +51,9 @@ export default function Login() {
           setErrorMessage('')
         }}
       />
-      <div>
-        <button type="submit" disabled={!username || !password}>
-          Login
-        </button>
-        <span onClick={()=>{navigate('/register')}}>
-            Register new account 
-        </span>
-      </div>
-
+      <button type="submit" disabled={!username || !password}>
+        Register
+      </button>
     </form>
   )
 }

@@ -1,24 +1,42 @@
 import { useEffect, useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { UserContext } from '../context'
+import { post, setToken } from "../utils/http";
 import style from './Home.module.css'
+const API_HOST = process.env.REACT_APP_API_HOST;
 
 export default function Home() {
   const navigate = useNavigate()
   const [selectedSize, setSelectedSize] = useState('5')
   const { user } = useContext(UserContext)
   const handleStart = () => {
-
-    if(user) {
-      navigate(`./Game/${selectedSize}`);
-    }else {
-      navigate(`./Login`);
-    }
+    createGameRequest(Number(selectedSize))
+    // if(user) {
+    //   navigate(`./Game/${selectedSize}`);
+    // }else {
+    //   navigate(`./Login`);
+    // }
   }
 
   const handleSizeChange = (event : React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedSize(event.target.value);
   };
+
+  const createGameRequest = async (size: number) => {
+    try {
+      const user = await post<{size: number}, any>(`${API_HOST}/api/game/createGame`, {size: size});
+      
+      return true;
+
+    } catch (error) {
+      if (error instanceof Error) {
+        return error.message;
+      }
+      return "Unable to login at this moment, please try again";
+    }
+  }
+    
+
 
   return (
     <div className={style.boardSelectContainer}>
