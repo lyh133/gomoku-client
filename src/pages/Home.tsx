@@ -9,35 +9,42 @@ export default function Home() {
   const navigate = useNavigate()
   const [selectedSize, setSelectedSize] = useState('5')
   const { user } = useContext(UserContext)
-  const handleStart = () => {
-    createGameRequest(Number(selectedSize))
-    // if(user) {
-    //   navigate(`./Game/${selectedSize}`);
-    // }else {
-    //   navigate(`./Login`);
-    // }
+
+  const handleStart = async () => {
+    
+    if(user) {
+      // const result = await createGameRequest(Number(selectedSize))
+      // if(result === true){
+      //   navigate(`./Game/${selectedSize}`);
+      // }else{
+      //   console.warn(result)
+      // }
+
+      navigate(`./Game/${selectedSize}`);
+      
+    }else {
+      navigate(`./Login`);
+    }
   }
 
   const handleSizeChange = (event : React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedSize(event.target.value);
   };
 
-  const createGameRequest = async (size: number) => {
-    try {
-      const user = await post<{size: number}, any>(`${API_HOST}/api/game/createGame`, {size: size});
+  // const createGameRequest = async (size: number) => {
+  //   try {
+  //     const user = await post<{size: number}, any>(`${API_HOST}/api/game/createGame`, {size: size});
       
-      return true;
+  //     return true;
 
-    } catch (error) {
-      if (error instanceof Error) {
-        return error.message;
-      }
-      return "Unable to login at this moment, please try again";
-    }
-  }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       return error.message;
+  //     }
+  //     return "Unable to login at this moment, please try again";
+  //   }
+  // }
     
-
-
   return (
     <div className={style.boardSelectContainer}>
         <select className={style.boardSelect} onChange={handleSizeChange}> 
