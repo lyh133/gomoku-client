@@ -56,10 +56,24 @@ export default function UserProvider({ children }: UserProviderProps) {
     }
   };
 
-  const logout = () => {
-    setUser(undefined);
-    setToken("");
+
+
+  const logout = async () => {
+    try {
+      post<{}, {}>(`${API_HOST}/api/auth/logout`, {});
+      console.log("Hi")
+      setUser(undefined);
+      setToken("");
+      return true;
+
+    } catch (error) {
+      if (error instanceof Error) {
+        return error.message;
+      }
+      return "Unable to login at this moment, please try again";
+    }
   };
+
 
   return (
     <UserContext.Provider value={{ user, login, register, logout }}>

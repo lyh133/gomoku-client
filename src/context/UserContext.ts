@@ -5,7 +5,7 @@ type UserContextType = {
   user?: User
   login: (username: string, password: string) => Promise<true | string>
   register: (username: string, password: string) => Promise<true | string>
-  logout: () => void
+  logout: () => Promise<true | string>
 }
 
 const UserContext = createContext<UserContextType>({} as UserContextType)

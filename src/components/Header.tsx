@@ -5,7 +5,7 @@ import { UserContext } from '../context'
 
 export default function Header() {
     const navigate = useNavigate()
-    // const location = useLocation()
+  
     const { user, logout } = useContext(UserContext)
     return (
         <header className={style.header}>
@@ -13,6 +13,7 @@ export default function Header() {
             <Link to="/">Gomoku</Link>
             {!user && <div className={style.actions} onClick={() => {navigate('./Login')}}>Log in</div>}
             {user && <div className={style.actions} onClick={() => {navigate('./Games')}}>Previous Games</div>}
+            {user && <div className={style.actions} onClick={()=>{logout()}}>Log out</div>}
           </div>
         </header>
       )

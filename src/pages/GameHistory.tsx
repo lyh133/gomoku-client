@@ -1,47 +1,39 @@
 import { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import style from './Game.module.css'
 import { UserContext } from '../context'
 import { useParams } from 'react-router-dom';
 import { move, gameHistory} from '../types'
 import { useLocalStorage } from '../hooks'
 
-const GameHistory: React.FC = () => {
+const GameHistory: React.FC = (props) => {
 
+    const location = useLocation();
+    const [game, setGame] = useState<gameHistory>()
 
-    const [size, setSize] = useState(0);
-    const { id } = useParams();
+    
 
-    const [save] = useLocalStorage< Array<gameHistory> | []>('gameHistory', [])
     const navigate = useNavigate()
 
     const { user } = useContext(UserContext)
+
     useEffect(() => {
       if(!user) {
           navigate(`../Login`)
       }
-    }, []);
+      setGame(location.state.game)
+    }, []);    
 
-    useEffect(() => {
-      setSize(Number(save[Number(id)].size))
-    }, [id]);
-    
     const findMove = (row: number, col: number): move | null => {
-      const game = save[Number(id)]
       let result: move | null = null;
-      game.moves.forEach(move => {
-        if(move.colIndex === col && move.rowIndex === row) {
-          result = move
-        }
-      })
+      if(game)
+        game.moves.forEach(move => {
+          if(move.colIndex === col && move.rowIndex === row) {
+            result = move
+          }
+        })
       return result
     }
-
-    const isBlack = (turn:number | null): boolean => {
-      if(turn == null) return true
-      return (turn % 2) !== 0 
-    }
-
 
     const handleBack = () => {
       navigate(`../Games`)
@@ -51,15 +43,16 @@ const GameHistory: React.FC = () => {
     const rows = [];
 
     //make Board
-    for (let r = 0; r < size; r++) {
+    if(game && game.size)
+    for (let r = 0; r < Number(game.size); r++) {
       const cells = [];
-      for(let c = 0; c < size; c++) {
+      for(let c = 0; c < Number(game.size); c++) {
         //find if there is a move in the cell
         const move = findMove(r, c);
         var circleClassName = `${style.circle}`;
         if(move){
           circleClassName = `${style.circle} ${
-              isBlack(move.moveNum)
+              move.player === 'black'
               ? `${style.black}`
               : `${style.white}`
           }`;
@@ -86,7 +79,7 @@ const GameHistory: React.FC = () => {
           {rows}
         </div> 
         <button onClick={handleBack}>Back</button>
-        <div style={{ fontSize: "50px"}}>{save[Number(id)].winner ? "winner is :" + save[Number(id)].winner : "Game draw"}</div>
+        <div style={{ fontSize: "50px"}}>{game && game.result !== 'draw' ? "winner is :" + game.result : "Game draw"}</div>
       </>
 
     );

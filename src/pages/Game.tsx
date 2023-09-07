@@ -11,47 +11,18 @@ const API_HOST = process.env.REACT_APP_API_HOST;
 
 const Game: React.FC = () => {
 
-    const [currentPlayer, setCurrentPlayer] = useState<playerType>("black");
-    const [moveNum, setMoveNum] = useState(1);
-    const [isDraw, setIsDraw] = useState(false);
     const [message, setMessage] = useState('black\'s turn');
     const { size } = useParams();
-
-
-    const [moves, setMoves] = useState<Array<move>>([])
-
-    const [save, setSave] = useLocalStorage< Array<gameHistory> | []>('gameHistory', [])
     const navigate = useNavigate()
-
-    const [board, setBoard] = useState<Array<Array<string | null>>>(
-        Array.from({ length: Number(size) }, () => Array(Number(size)).fill(null))
-      );
-
     const { user } = useContext(UserContext)
 
 
     const [gameState, setGameState] = useState<gameState>();
-
     
     useEffect(() => {
-
-      const createGameRequest = async (size: number) => {
-        try {
-          const result : gameState = await post<{size: number}, any>(`${API_HOST}/api/game/createGame`, {size: size});
-          setGameState(result)
-              
-        } catch (error) {
-          if (error instanceof Error) {
-            alert(error.message)
-            return
-          }
-          alert("Unable to login at this moment, please try again");
-        }
-      }
-
-      createGameRequest(Number(size))
+      if(size != null)
+        createGameRequest(Number(size))
     }, []);
-
 
     useEffect(() => {
       if(!user) {
@@ -62,28 +33,20 @@ const Game: React.FC = () => {
 
 
     const saveGame = () => {
-
       if(gameState && gameState.isFinished){
-        let today  = new Date();
-        const newGame:gameHistory = {
-          date: today.toISOString().split('T')[0],
-          winner: isDraw ? null : currentPlayer === 'black' ? 'white' : 'black',
-          size: Number(size),
-          moves: moves
-        }
-        const updatedSave = [...save]
-        setSave(updatedSave.concat(newGame))
+        saveGameRequest();
         navigate(`../Games`);
-
-      } else {
+      }else{
+        exitGameRequest();
         navigate(`../`);
-
       }
+    }
 
+    const restartGame = async () => {
+      exitGameRequest()
+      navigate(0);
     }
-    const restartGame = () => {
-      navigate(0)
-    }
+  
 
     useEffect(() => {
       if(gameState){
@@ -101,16 +64,6 @@ const Game: React.FC = () => {
 
     const handleBoxClick = (rowIndex: number, colIndex: number) => {
 
-      // if (!gameEnded && !board[rowIndex][colIndex]) {
-      //   const updatedMoves = [...moves]
-      //   setMoves(updatedMoves.concat({ rowIndex: rowIndex, colIndex: colIndex, player: currentPlayer, moveNum: moveNum}))
-      //   const updatedBoard = [...board];
-      //   updatedBoard[rowIndex][colIndex] = currentPlayer;
-      //   setBoard(updatedBoard);
-      //   setCurrentPlayer(currentPlayer === "black" ? "white" : "black");
-      //   setMoveNum(moveNum+1)
-      // }
-
       if(gameState && !gameState.isFinished && ! gameState.board[rowIndex][colIndex]) {
         updateGameRequest(rowIndex,colIndex)
       }
@@ -126,7 +79,42 @@ const Game: React.FC = () => {
         if (error instanceof Error) {
           alert(error.message);
         }
-        alert("Unable to login at this moment, please try again");
+        alert("Unable to make move, please try again");
+      }
+    }
+
+    const saveGameRequest = async () => {
+      try {
+        if(gameState && gameState.isFinished)
+          await post<{}, any>(`${API_HOST}/api/game/saveGameHistory`, {});            
+      } catch (error) {
+        if (error instanceof Error) {
+          alert(error.message)
+          return
+        }
+        alert("Unable to save game, please try again");
+      }
+    }
+
+    const exitGameRequest = async () => {
+      try {
+          await post<{}, any>(`${API_HOST}/api/game/exitGame`, {});            
+      } catch (error) {
+        if (error instanceof Error) {
+          return
+        }
+      }
+    }
+
+    const createGameRequest = async (size: number) => {
+      try {
+        const result : gameState = await post<{size: number}, any>(`${API_HOST}/api/game/createGame`, {size: size});
+        setGameState(result)
+            
+      } catch (error) {
+        if (error instanceof Error) {
+          return
+        }
       }
     }
 

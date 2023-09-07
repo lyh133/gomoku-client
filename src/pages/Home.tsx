@@ -10,6 +10,30 @@ export default function Home() {
   const [selectedSize, setSelectedSize] = useState('5')
   const { user } = useContext(UserContext)
 
+
+  // useEffect(() => {
+    
+  //   const isGameActive = async () => {
+  //     try {
+  //       const result = await post<{}, any>(`${API_HOST}/api/game/getActiveGame`, {});
+        
+  //       if(result != null) {
+  //         navigate(`./Game/${result.game.board.length}`)
+        
+  //       } else{
+
+  //       }
+            
+  //     } catch (error) {
+  //       if (error instanceof Error) {
+  //         return
+  //       }
+  //     }
+  //   }
+  //   isGameActive()
+  // }, []);
+
+
   const handleStart = async () => {
     
     if(user) {

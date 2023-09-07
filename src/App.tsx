@@ -17,7 +17,7 @@ function App() {
             <Route path="register" element={<Register />} />
             <Route path="game/:size" element={<Game />} />
             <Route path="games" element={<Games />} />
-            <Route path="game-log/:id" element={<GameHistory />} />
+            <Route path="game-log/" element={<GameHistory />} />
         </Routes>        
       </main>
     </UserProvider>

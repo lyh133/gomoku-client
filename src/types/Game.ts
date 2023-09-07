@@ -17,7 +17,7 @@ export type gameState = {
 
 export type gameHistory = {
   date: string;
-  winner: playerType | null;
+  result: gameResult;
   size: Number;
   moves: Array<move>;
 }
